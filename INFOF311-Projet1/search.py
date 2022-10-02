@@ -210,12 +210,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         visited.append(current[0])
 
         for action in problem.expand(current[0]):
-            pathCost[action[0]] = action[2] + currentCost
-            newfCost = aStarEvaluation(problem, action, pathCost[action[0]], heuristic) 
-
-            if newfCost < fCost.get(action[0], float('inf')):
-                fCost[action[0]] = newfCost
             
+            newPathCost = action[2] + currentCost
+            
+            if newPathCost < pathCost.get(action[0], float('inf')):
+                pathCost[action[0]] = newPathCost
+                fCost[action[0]] = aStarEvaluation(problem, action, pathCost[action[0]], heuristic) 
+                
             queue.push(action, fCost[action[0]])
             path[action] = current
 
