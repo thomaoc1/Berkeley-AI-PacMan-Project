@@ -146,7 +146,7 @@ def depthFirstSearch(problem):
             stack.push(action)
             path[action] = current
             
-    #  util.raiseNotDefined()
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -173,8 +173,8 @@ def breadthFirstSearch(problem):
             queue.push(action)
             path[action] = current
     
-    #  util.raiseNotDefined()
-
+    return []
+    
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -220,8 +220,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             queue.push(action, fCost[action[0]])
             path[action] = current
 
-    # util.raiseNotDefined()
-
+    return []
 
 # Abbreviations
 bfs = breadthFirstSearch
