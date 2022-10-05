@@ -101,6 +101,9 @@ def tinyMazeSearch(problem):
 
 
 def pathMapToList(pathMap : dict, goal : tuple) -> list:
+    """
+    Converts a path map to a list of actions.
+    """
     path = []
     current = goal
     while current != None:
@@ -131,6 +134,7 @@ def depthFirstSearch(problem):
     stack = util.Stack()
     stack.push((problem.getStartState(), None))
 
+    # DFS
     while (not stack.isEmpty()):
         current = stack.pop()
 
@@ -149,7 +153,8 @@ def depthFirstSearch(problem):
 
             # Update path map
             path[nextNode] = current           
-            
+           
+    # No path
     return []
 
 def breadthFirstSearch(problem):
@@ -162,6 +167,7 @@ def breadthFirstSearch(problem):
     queue = util.Queue()
     queue.push((problem.getStartState(), None))
 
+    # BFS 
     while (not queue.isEmpty()):
         current = queue.pop()
 
@@ -181,6 +187,7 @@ def breadthFirstSearch(problem):
             # Update path map
             path[nextNode] = current
     
+    # No path
     return []
     
 def nullHeuristic(state, problem=None):
@@ -205,8 +212,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     queue = util.PriorityQueue()
     queue.push((problem.getStartState(), None, 0), 0)
 
+    # A* Search
     while(not queue.isEmpty()):
         current = queue.pop()
+
+        # Updating accumulated cost of traversal
         currentCost = pathCost.get(current[0])
 
         if problem.isGoalState(current[0]):
@@ -220,14 +230,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         for action in problem.expand(current[0]):
             
             newPathCost = action[2] + currentCost
+            nextState = action[0]
             
-            if newPathCost < pathCost.get(action[0], float('inf')):
-                pathCost[action[0]] = newPathCost
-                fCost[action[0]] = aStarEvaluation(problem, action, pathCost[action[0]], heuristic) 
+            # If path cost higher than current, fcost will also be higher
+            if newPathCost >= pathCost.get(nextState, float('inf')):
+                continue
                 
-            queue.push(action, fCost[action[0]])
+            # Update costs
+            pathCost[nextState] = newPathCost
+            fCost[nextState] = aStarEvaluation(problem, action, pathCost[nextState], heuristic) 
+            
+            queue.push(action, fCost[nextState])
             path[action] = current
+            
+    
 
+    # No path
     return []
 
 # Abbreviations
