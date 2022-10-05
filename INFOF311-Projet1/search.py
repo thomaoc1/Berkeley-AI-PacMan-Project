@@ -103,11 +103,11 @@ def tinyMazeSearch(problem):
 def pathMapToList(pathMap : dict, goal : tuple) -> list:
     path = []
     current = goal
-    while current != None and current[1] != None:
+    while current != None:
         path.append(current[1])
         current = pathMap.get(current)
 
-    return list(reversed(path))
+    return list(reversed(path[:-1]))
 
 
 def depthFirstSearch(problem):
@@ -129,7 +129,7 @@ def depthFirstSearch(problem):
     visited = []
 
     stack = util.Stack()
-    stack.push((problem.getStartState(), None, 0))
+    stack.push((problem.getStartState(), None))
 
     while (not stack.isEmpty()):
         current = stack.pop()
@@ -143,8 +143,12 @@ def depthFirstSearch(problem):
         visited.append(current[0])
 
         for action in problem.expand(current[0]):
-            stack.push(action)
-            path[action] = current
+            # Ommit score
+            nextNode = (action[0], action[1])  
+            stack.push(nextNode)
+
+            # Update path map
+            path[nextNode] = current           
             
     return []
 
@@ -156,7 +160,7 @@ def breadthFirstSearch(problem):
     visited = []
     
     queue = util.Queue()
-    queue.push((problem.getStartState(), None, 0))
+    queue.push((problem.getStartState(), None))
 
     while (not queue.isEmpty()):
         current = queue.pop()
@@ -170,8 +174,12 @@ def breadthFirstSearch(problem):
         visited.append(current[0])
 
         for action in problem.expand(current[0]):
-            queue.push(action)
-            path[action] = current
+            # Ommit score
+            nextNode = (action[0], action[1])  
+            queue.push(nextNode)
+
+            # Update path map
+            path[nextNode] = current
     
     return []
     
