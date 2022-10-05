@@ -162,7 +162,7 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
 
     path = {}
-    visited = []
+    visited = [problem.getStartState()]
     
     queue = util.Queue()
     queue.push((problem.getStartState(), None))
@@ -174,18 +174,13 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(current[0]):
             return pathMapToList(path, current)
 
-        if current[0] in visited:
-            continue
-
-        visited.append(current[0])
-
         for action in problem.expand(current[0]):
-            # Ommit score
-            nextNode = (action[0], action[1])  
-            queue.push(nextNode)
+            if action[0] in visited:
+                continue
 
-            # Update path map
-            path[nextNode] = current
+            visited.append(action[0])
+            queue.push(action)
+            path[action] = current
     
     # No path
     return []
