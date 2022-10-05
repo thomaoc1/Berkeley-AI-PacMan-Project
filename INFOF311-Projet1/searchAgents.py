@@ -352,7 +352,6 @@ class CornersProblem(search.SearchProblem):
                     print("Goal: " + str(nextState))
 
             child = (nextState, self.cornersLeft)
-
             children.append((child, action, self.getActionCost(state, action, child)))
 
         self._expanded += 1 # DO NOT CHANGE
