@@ -286,6 +286,43 @@ def euclideanHeuristic(position, problem, info={}):
 # This portion is incomplete.  Time to write code!  #
 #####################################################
 
+class CPNodeInfo():
+    """
+    Corners Problem Node Information class used to store information on 
+    corners traversed for a route.
+    """
+
+    def __init__(self, cornersExplored=[False] * 4):
+        self._cornersExplored = cornersExplored
+
+    def __eq__(self, other):
+        """
+        Returns whether corner traversal status is equivalent
+        """
+        return self.cornersExplored == other.cornersExplored
+
+    def __hash__(self):
+        return hash(tuple(self.cornersExplored))
+
+    @property
+    def cornersExplored(self):
+        return self._cornersExplored
+
+    def allExplored(self):
+        """
+        Returns whether route has covered all corners
+        """
+        return not (False in self.cornersExplored)
+
+    def updateCorner(self, idx):
+        """
+        Updates corner traversal status to true
+        """
+        if idx >= len(self.cornersExplored):
+            raise IndexError("Not a corner")
+
+        self._cornersExplored[idx] = True
+
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -307,24 +344,25 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
+        
         "*** YOUR CODE HERE ***"
-        self.cornersExplored = [False] * 4
-        self.cornersLeft = 4
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
+        
         "*** YOUR CODE HERE ***"
-        return (self.startingPosition, self.cornersLeft)
+        return (self.startingPosition, CPNodeInfo())  # Default constructor for CPNode
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
+        
         "*** YOUR CODE HERE ***"
-        return state[1] == 0
+        return state[1].allExplored()
             
     def expand(self, state):
         """
@@ -336,22 +374,13 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
-
         children = []
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
+            
             "*** YOUR CODE HERE ***"
-            
-            nextState = self.getNextState(state, action)[0]
-            
-            if nextState in self.corners:
-                if not self.cornersExplored[self.corners.index(nextState)]:
-                    self.cornersExplored[self.corners.index(nextState)] = True
-                    self.cornersLeft -= 1
-                    print("Goal: " + str(nextState))
-
-            child = (nextState, self.cornersLeft)
+            child = self.getNextState(state, action)
             children.append((child, action, self.getActionCost(state, action, child)))
 
         self._expanded += 1 # DO NOT CHANGE
@@ -374,13 +403,21 @@ class CornersProblem(search.SearchProblem):
         return 1
 
     def getNextState(self, state, action):
+        from copy import deepcopy
         assert action in self.getActions(state), (
             "Invalid action passed to getActionCost().")
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
+        
         "*** YOUR CODE HERE ***"
-        return ((nextx, nexty), self.cornersLeft)
+        nextState = (nextx, nexty)
+        cpNodeInfo = deepcopy(state[1])  # Copy route information
+
+        if nextState in self.corners:    # Update if next state is a corner
+            cpNodeInfo.updateCorner(self.corners.index(nextState))
+
+        return (nextState, cpNodeInfo)
 
     def getCostOfActionSequence(self, actions):
         """
