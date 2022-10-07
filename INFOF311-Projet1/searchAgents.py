@@ -346,6 +346,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         
         "*** YOUR CODE HERE ***"
+        # State structure : (PacMan location, CPNodeInfo)
 
     def getStartState(self):
         """
@@ -362,7 +363,8 @@ class CornersProblem(search.SearchProblem):
         """
         
         "*** YOUR CODE HERE ***"
-        return state[1].allExplored()
+        routeInfo = state[1]
+        return routeInfo.allExplored()
             
     def expand(self, state):
         """
@@ -381,7 +383,8 @@ class CornersProblem(search.SearchProblem):
             
             "*** YOUR CODE HERE ***"
             child = self.getNextState(state, action)
-            children.append((child, action, self.getActionCost(state, action, child)))
+            actionCost = self.getActionCost(state, action, child)
+            children.append((child, action, actionCost))
 
         self._expanded += 1 # DO NOT CHANGE
         return children
@@ -450,7 +453,18 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    fn = 0
+    postion = state[0]
+    routeInfo = state[1]
+
+    visited = lambda i: routeInfo.cornersExplored[i]
+    cornersLeft = [corners[i] for i in range(len(corners)) if not visited(i)]
+
+    # Shortest distance to unvisited corner
+    for corner in cornersLeft:
+        fn = max(fn, util.manhattanDistance(postion, corner))
+
+    return fn
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

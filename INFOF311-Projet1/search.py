@@ -105,11 +105,13 @@ def pathMapToList(pathMap : dict, goal : tuple) -> list:
     Converts a path map to a list of actions.
     """
     path = []
+    nodePath = []
     current = goal
     while current != None:
         path.append(current[1])
+        nodePath.append(current[0][0])
         current = pathMap.get(current)
-
+    
     return list(reversed(path[:-1]))
 
 
@@ -126,13 +128,13 @@ def depthFirstSearch(problem):
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
     
+    "*** YOUR CODE HERE ***"
     path = {}
     visited = []
 
     stack = util.Stack()
-    stack.push((problem.getStartState(), None))
+    stack.push((problem.getStartState(), None, 0))
 
     # DFS
     while (not stack.isEmpty()):
@@ -140,32 +142,28 @@ def depthFirstSearch(problem):
 
         if problem.isGoalState(current[0]):
             return pathMapToList(path, current)
-
+        
         if current[0] in visited:
             continue
 
         visited.append(current[0])
 
         for action in problem.expand(current[0]):
-            # Ommit score
-            nextNode = (action[0], action[1])  
-            stack.push(nextNode)
-
-            # Update path map
-            path[nextNode] = current           
+            stack.push(action)
+            path[action] = current  # Update path       
            
     # No path
     return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+    
     "*** YOUR CODE HERE ***"
-
     path = {}
     visited = [problem.getStartState()]
     
     queue = util.Queue()
-    queue.push((problem.getStartState(), None))
+    queue.push((problem.getStartState(), None, 0))
 
     # BFS 
     while (not queue.isEmpty()):
@@ -180,7 +178,7 @@ def breadthFirstSearch(problem):
 
             visited.append(action[0])
             queue.push(action)
-            path[action] = current
+            path[action] = current  # Update path
     
     # No path
     return []
@@ -237,8 +235,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             
             queue.push(action, fCost[nextState])
             path[action] = current
-            
-    
 
     # No path
     return []
