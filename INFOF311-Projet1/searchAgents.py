@@ -460,7 +460,7 @@ def cornersHeuristic(state, problem):
     visited = lambda i: routeInfo.cornersExplored[i]
     cornersLeft = [corners[i] for i in range(len(corners)) if not visited(i)]
 
-    # Shortest distance to unvisited corner
+    # Longest distance to unvisited corner
     for corner in cornersLeft:
         fn = max(fn, util.manhattanDistance(postion, corner))
 
@@ -580,7 +580,15 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    pacToFood = float('inf')
+    foodToFood = 0
+
+    for food1 in foodGrid.asList():
+        min(pacToFood, util.manhattanDistance(food1, position))
+        for food2 in foodGrid.asList():
+            max(foodToFood, util.manhattanDistance(food1, food2))
+
+    return pacToFood + foodToFood if pacToFood < float('inf') else foodToFood
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
