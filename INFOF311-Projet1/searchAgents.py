@@ -580,13 +580,17 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    
+    # Took inspiration from the following report :
+    #     https://rshcaroline.github.io/research/resources/pacman-report.pdf
+
     pacToFood = float('inf')
     foodToFood = 0
 
     for food1 in foodGrid.asList():
-        min(pacToFood, util.manhattanDistance(food1, position))
+        pacToFood = min(pacToFood, util.manhattanDistance(food1, position))
         for food2 in foodGrid.asList():
-            max(foodToFood, util.manhattanDistance(food1, food2))
+            foodToFood = max(foodToFood, util.manhattanDistance(food1, food2))
 
     return pacToFood + foodToFood if pacToFood < float('inf') else foodToFood
 
