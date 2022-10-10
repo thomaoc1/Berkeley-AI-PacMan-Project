@@ -305,7 +305,7 @@ class CPNodeInfo():
         return hash(tuple(self.cornersExplored))
 
     @property
-    def cornersExplored(self):
+    def cornersExplored(self) -> list:
         return self._cornersExplored
 
     def allExplored(self):
@@ -314,7 +314,7 @@ class CPNodeInfo():
         """
         return not (False in self.cornersExplored)
 
-    def updateCorner(self, idx):
+    def updateCorner(self, idx : int):
         """
         Updates corner traversal status to true
         """
@@ -386,6 +386,7 @@ class CornersProblem(search.SearchProblem):
             actionCost = self.getActionCost(state, action, child)
             children.append((child, action, actionCost))
 
+            
         self._expanded += 1 # DO NOT CHANGE
         return children
 
@@ -453,6 +454,12 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    # Heursitic calculation : 
+    #   Furthest food to state (manhattan distance)
+    #
+    #   Admissible  (y)
+    #   Consistent  (y)
+
     fn = 0
     postion = state[0]
     routeInfo = state[1]
@@ -579,16 +586,23 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
     
-    # Took inspiration from the following report :
-    #     https://rshcaroline.github.io/research/resources/pacman-report.pdf
-
+    "*** YOUR CODE HERE ***"
+    # Heursitic calculation : 
+    #   Closest food to state (manhattan distance)
+    #   + furthest manhattan distance between any two foods
+    #
+    #   Admissible  (y)
+    #   Consistent  (y)
+    
     pacToFood = float('inf')
     foodToFood = 0
-
+    
+    # Closest food
     for food1 in foodGrid.asList():
         pacToFood = min(pacToFood, util.manhattanDistance(food1, position))
+        
+        # Greatest distance between two foods
         for food2 in foodGrid.asList():
             foodToFood = max(foodToFood, util.manhattanDistance(food1, food2))
 
@@ -623,7 +637,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.bfs(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -659,7 +673,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return state in self.food.asList()
 
 def mazeDistance(point1, point2, gameState):
     """
