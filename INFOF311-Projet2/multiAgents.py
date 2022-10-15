@@ -169,6 +169,45 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
+
+    def chanceAgent(self, depth : int, gameState : GameState, agentIdx):
+        actionsCost = 0
+        optmAction = []
+
+        for action in gameState.getLegalActions(agentIdx):
+            nextState = gameState.getNextState(agentIdx, action)
+            actionsCost += (1 / len(gameState.getLegalActions(agentIdx))) * self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
+
+        return (optmAction, actionsCost)
+
+    def maxiAgent(self, depth : int, gameState : GameState, agentIdx=0):
+        optmActionCost = float('-inf')
+        optmAction = []
+
+        for action in gameState.getLegalActions(agentIdx):
+            nextState = gameState.getNextState(agentIdx, action)
+            actionCost = self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
+            if actionCost > optmActionCost:
+                optmActionCost, optmAction = actionCost, action 
+
+        return (optmAction, optmActionCost)
+
+    def expectiMinimax(self, depth : int, gameState : GameState, agentIdx = 0):
+        
+        # Decrementing depth
+        if agentIdx and not agentIdx % gameState.getNumAgents():
+            depth -= 1
+        
+        if depth == 0 or gameState.isWin() or gameState.isLose():
+            return ([], self.evaluationFunction(gameState))
+        
+        # Rotating agents
+        agentIdx %= gameState.getNumAgents()
+
+        if agentIdx == 0: return self.maxiAgent(depth, gameState)
+        else: return self.chanceAgent(depth, gameState, agentIdx)
+
+
     def getAction(self, state: GameState):
         """
         Returns the expectimax action using self.depth and self.evaluationFunction
@@ -177,7 +216,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.expectiMinimax(self.depth, state)[0]
 
 def betterEvaluationFunction(state: GameState):
     """
