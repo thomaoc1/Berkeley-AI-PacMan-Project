@@ -56,14 +56,29 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
-    def foo(self, gameState, depth, agentIdx):
+    def minimax(self, depth : int, gameState : GameState, agentIdx = 0):
+        
+        # Decrementing depth
+        if agentIdx and not agentIdx % gameState.getNumAgents():
+            depth -= 1
+        
+        if depth == 0 or gameState.isWin() or gameState.isLose():
+            return ([], self.evaluationFunction(gameState))
+        
+        # Rotating agents
+        agentIdx %= gameState.getNumAgents()
+
+        # Which initial optimal cost to use
         optmActionCost = float('-inf') if agentIdx == 0 else float('inf')
         optmAction = []
         
+        # Minimising agent comparator
         lt = lambda cost1, cost2 : cost1 < cost2
+        # Maximising agent comparator
         gt = lambda cost1, cost2 : cost1 > cost2
         compareCost = gt if agentIdx == 0 else lt
 
+        # Minimax tree
         for action in gameState.getLegalActions(agentIdx):
             nextState = gameState.getNextState(agentIdx, action)
             actionCost = self.minimax(depth, nextState, agentIdx + 1)[1]
@@ -71,53 +86,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 optmActionCost, optmAction = actionCost, action 
 
         return (optmAction, optmActionCost)
-
-
-    def maximise(self, gameState : GameState, depth : int, agentIdx=0):
-        """
-        Method for maximising agent (idx == 0)
-        """
-        
-        maxEval, maxAction = float('-inf'), []
-        for action in gameState.getLegalActions(agentIdx):
-            nextState = gameState.getNextState(agentIdx, action)
-            tmpEval = self.minimax(depth, nextState, agentIdx + 1)[1]
-            if tmpEval > maxEval:
-                maxEval, maxAction = tmpEval, action 
-
-        return (maxAction, maxEval)
-    
-    def minimise(self,gameState : GameState, depth : int, agentIdx):
-        """
-        Method for minimising agent (idx != 0)
-        """
-
-        minEval, minAction = float('inf'), []
-        for action in gameState.getLegalActions(agentIdx):
-            nextState = gameState.getNextState(agentIdx, action)
-            tmpEval = self.minimax(depth, nextState, agentIdx + 1)[1]
-            if tmpEval < minEval:
-                minEval, minAction = tmpEval, action 
-
-        return (minAction, minEval)
-
-    def minimax(self, depth : int, gameState : GameState, agentIdx = 0):
-        
-        if agentIdx and not agentIdx % gameState.getNumAgents():
-            depth -= 1
-        
-        if depth == 0 or gameState.isWin() or gameState.isLose():
-            return ([], self.evaluationFunction(gameState))
-        
-        agentIdx %= gameState.getNumAgents()
-
-        # Maximising agent
-        if agentIdx == 0:
-            return self.maximise(gameState, depth)
-
-        # Minimising agent(s)
-        else:
-            return self.minimise(gameState, depth, agentIdx) 
 
     def getAction(self, state: GameState):
         """
@@ -149,61 +117,45 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
     """
-    def maximise(self, gameState : GameState, depth : int, alpha, beta, agentIdx=0):
-        """
-        Method for maximising agent (idx == 0)
-        """
-        
-        maxEval, maxAction = float('-inf'), []
-        for action in gameState.getLegalActions(agentIdx):
-            nextState = gameState.getNextState(agentIdx, action)
-            tmpEval = self.minimax(depth, nextState, agentIdx + 1, alpha, beta)[1]
-
-            if tmpEval > maxEval:
-                maxEval, maxAction = tmpEval, action 
-
-            alpha = max(alpha, tmpEval)
-            if beta < alpha:
-                break
-      
-        return (maxAction, maxEval)
-    
-    def minimise(self,gameState : GameState, depth : int, alpha, beta, agentIdx):
-        """
-        Method for minimising agent (idx != 0)
-        """
-
-        minEval, minAction = float('inf'), []
-        for action in gameState.getLegalActions(agentIdx):
-            nextState = gameState.getNextState(agentIdx, action)
-            tmpEval = self.minimax(depth, nextState, agentIdx + 1, alpha, beta)[1]
-
-            if tmpEval < minEval:
-                minEval, minAction = tmpEval, action 
-                 
-            beta = min(beta, tmpEval)
-            if beta < alpha:
-                break
-        
-        return (minAction, minEval)
 
     def minimax(self, depth : int, gameState : GameState, agentIdx=0, alpha=float('-inf') , beta=float('inf')):
         
+        # Decrementing depth
         if agentIdx and not agentIdx % gameState.getNumAgents():
             depth -= 1
         
         if depth == 0 or gameState.isWin() or gameState.isLose():
             return ([], self.evaluationFunction(gameState))
         
+        # Rotating agents
         agentIdx %= gameState.getNumAgents()
 
-        # Maximising agent
-        if agentIdx == 0:
-            return self.maximise(gameState, depth, alpha, beta)
+        # Which initial optimal cost to use
+        optmActionCost = float('-inf') if agentIdx == 0 else float('inf')
+        optmAction = []
+        
+        # Minimising agent comparator
+        lt = lambda cost1, cost2 : cost1 < cost2
+        # Maximising agent comparator
+        gt = lambda cost1, cost2 : cost1 > cost2
+        compareCost = gt if agentIdx == 0 else lt
 
-        # Minimising agent(s)
-        else:
-            return self.minimise(gameState, depth, alpha, beta, agentIdx)
+        # Minimax tree
+        for action in gameState.getLegalActions(agentIdx):
+            nextState = gameState.getNextState(agentIdx, action)
+            actionCost = self.minimax(depth, nextState, agentIdx + 1, alpha, beta)[1]
+            
+            if compareCost(actionCost, optmActionCost):
+                optmActionCost, optmAction = actionCost, action 
+
+            # Prunning
+            if agentIdx == 0: alpha = max(alpha, actionCost)
+            else: beta = min(beta, actionCost)
+
+            if beta < alpha:
+                break
+
+        return (optmAction, optmActionCost)
 
     def getAction(self, state: GameState):
         """
