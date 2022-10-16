@@ -63,7 +63,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             depth -= 1
         
         if depth == 0 or gameState.isWin() or gameState.isLose():
-            return ([], self.evaluationFunction(gameState))
+            return (None, self.evaluationFunction(gameState))
         
         # Rotating agents
         agentIdx %= gameState.getNumAgents()
@@ -125,7 +125,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             depth -= 1
         
         if depth == 0 or gameState.isWin() or gameState.isLose():
-            return ([], self.evaluationFunction(gameState))
+            return (None, self.evaluationFunction(gameState))
         
         # Rotating agents
         agentIdx %= gameState.getNumAgents()
@@ -169,18 +169,24 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
-
     def chanceAgent(self, depth : int, gameState : GameState, agentIdx):
+        """
+        Method for chance-agent node evaluation
+        """
+
         actionsCost = 0
-        optmAction = []
 
         for action in gameState.getLegalActions(agentIdx):
             nextState = gameState.getNextState(agentIdx, action)
             actionsCost += (1 / len(gameState.getLegalActions(agentIdx))) * self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
 
-        return (optmAction, actionsCost)
+        return (None, actionsCost)
 
     def maxiAgent(self, depth : int, gameState : GameState, agentIdx=0):
+        """
+        Method for chance-agent node evaluation
+        """
+
         optmActionCost = float('-inf')
         optmAction = []
 
@@ -199,7 +205,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             depth -= 1
         
         if depth == 0 or gameState.isWin() or gameState.isLose():
-            return ([], self.evaluationFunction(gameState))
+            return (None, self.evaluationFunction(gameState))
         
         # Rotating agents
         agentIdx %= gameState.getNumAgents()
@@ -218,15 +224,53 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         return self.expectiMinimax(self.depth, state)[0]
 
-def betterEvaluationFunction(state: GameState):
+def betterEvaluationFunction(state : GameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: 
+    
+    pacToFood    :  distance to closest food
+    foodLeft     :  amount of food left
+    capsulesLeft :  amount of capsules left
+    pacToGhost   :  distance to closest ghost
+    
+    Eval(state) =    [  20 / (pacToFood) ] 
+                   + [  -100 * foodLeft  ] 
+                   + [ 15 * capsulesLeft ] 
+                   + [    300 * score    ] 
+                   + [ 10 / (pacToGhost) ]
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()    
+    
+    if state.isLose(): return float('-inf')
+    elif state.isWin(): return float('inf')
+
+    foodGrid = state.getFood().asList()
+    capsulePos = state.getCapsules()
+    pacmanPos = state.getPacmanPosition()
+    ghostPos = state.getGhostPositions()
+    
+    pacToFood = float('inf')
+    pacToGhost = float('inf')
+    pacToCapsule = float('inf')
+    
+    # Closest food
+    for food in foodGrid:
+        pacToFood = min(pacToFood, util.manhattanDistance(food, pacmanPos))
+
+    for capsule in capsulePos:
+        pacToCapsule = min(pacToCapsule, util.manhattanDistance(capsule, pacmanPos))
+
+    for ghost in ghostPos:
+        pacToGhost = min(pacToGhost, util.manhattanDistance(ghost, pacmanPos))
+
+    return 20 / (pacToFood) \
+            + 100 * -(state.getNumFood()) \
+            + 15 * -(len(capsulePos)) \
+            + 300 * state.getScore() \
+            + 10 / (pacToGhost)
 
 # Abbreviation
 better = betterEvaluationFunction
