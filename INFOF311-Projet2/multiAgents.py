@@ -56,8 +56,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
-    def minimax(self, depth : int, gameState : GameState, agentIdx = 0):
-        
+    def minimax(self, depth : int, gameState : GameState, agentIdx = 0) -> tuple:
+        """
+        Minimax algorithm, returns optimal action and its cost
+        """
+
         # Decrementing depth
         if agentIdx and not agentIdx % gameState.getNumAgents():
             depth -= 1
@@ -76,6 +79,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         lt = lambda cost1, cost2 : cost1 < cost2
         # Maximising agent comparator
         gt = lambda cost1, cost2 : cost1 > cost2
+
         compareCost = gt if agentIdx == 0 else lt
 
         # Minimax tree
@@ -118,8 +122,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Your minimax agent with alpha-beta pruning (question 3)
     """
 
-    def minimax(self, depth : int, gameState : GameState, agentIdx=0, alpha=float('-inf') , beta=float('inf')):
-        
+    def minimax(self, depth : int, gameState : GameState, agentIdx=0, alpha=float('-inf') , beta=float('inf')) -> tuple:
+        """
+        Minimax algorithm with alpha-beta prunning, returns optimal action and its cost
+        """
+
         # Decrementing depth
         if agentIdx and not agentIdx % gameState.getNumAgents():
             depth -= 1
@@ -138,6 +145,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         lt = lambda cost1, cost2 : cost1 < cost2
         # Maximising agent comparator
         gt = lambda cost1, cost2 : cost1 > cost2
+
         compareCost = gt if agentIdx == 0 else lt
 
         # Minimax tree
@@ -166,30 +174,34 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
-      Your expectimax agent (question 4)
+    Your expectimax agent (question 4)
     """
 
-    def chanceAgent(self, depth : int, gameState : GameState, agentIdx):
+    def chanceAgent(self, depth : int, gameState : GameState, agentIdx) -> tuple:
         """
         Method for chance-agent node evaluation
         """
 
-        actionsCost = 0
+        averageCost = 0
+        legalActions = gameState.getLegalActions(agentIdx)
+        p = (1 / len(gameState.getLegalActions(agentIdx)))
 
-        for action in gameState.getLegalActions(agentIdx):
+        # Computing average cost using uniform probability p for each action
+        for action in legalActions:
             nextState = gameState.getNextState(agentIdx, action)
-            actionsCost += (1 / len(gameState.getLegalActions(agentIdx))) * self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
+            averageCost += p * self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
 
-        return (None, actionsCost)
+        return (None, averageCost)
 
-    def maxiAgent(self, depth : int, gameState : GameState, agentIdx=0):
+    def maxiAgent(self, depth : int, gameState : GameState, agentIdx=0) -> tuple:
         """
-        Method for chance-agent node evaluation
+        Method for maximising agent node evaluation
         """
 
         optmActionCost = float('-inf')
         optmAction = []
 
+        # Traversing children
         for action in gameState.getLegalActions(agentIdx):
             nextState = gameState.getNextState(agentIdx, action)
             actionCost = self.expectiMinimax(depth, nextState, agentIdx + 1)[1]
@@ -198,8 +210,11 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
         return (optmAction, optmActionCost)
 
-    def expectiMinimax(self, depth : int, gameState : GameState, agentIdx = 0):
-        
+    def expectiMinimax(self, depth : int, gameState : GameState, agentIdx = 0) -> tuple:
+        """
+        Expectiminimax algorithm, returns optimal action and its cost
+        """
+
         # Decrementing depth
         if agentIdx and not agentIdx % gameState.getNumAgents():
             depth -= 1
@@ -248,27 +263,25 @@ def betterEvaluationFunction(state : GameState):
     elif state.isWin(): return float('inf')
 
     foodGrid = state.getFood().asList()
-    capsulePos = state.getCapsules()
+    capsulePosLeft = len(state.getCapsules())
     pacmanPos = state.getPacmanPosition()
     ghostPos = state.getGhostPositions()
     
     pacToFood = float('inf')
     pacToGhost = float('inf')
-    pacToCapsule = float('inf')
     
     # Closest food
     for food in foodGrid:
         pacToFood = min(pacToFood, util.manhattanDistance(food, pacmanPos))
 
-    for capsule in capsulePos:
-        pacToCapsule = min(pacToCapsule, util.manhattanDistance(capsule, pacmanPos))
-
+    # Closest ghost
     for ghost in ghostPos:
         pacToGhost = min(pacToGhost, util.manhattanDistance(ghost, pacmanPos))
 
+    # Weighted linear combination of features
     return 20 / (pacToFood) \
             + 100 * -(state.getNumFood()) \
-            + 15 * -(len(capsulePos)) \
+            + 15 * -(capsulePosLeft) \
             + 300 * state.getScore() \
             + 10 / (pacToGhost)
 
