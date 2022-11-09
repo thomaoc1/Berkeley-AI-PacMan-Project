@@ -175,7 +175,6 @@ def eliminateWithCallTracking(callTrackingList=None):
         # Factor with variable removed
         newFactor = Factor(unconditioned, factor.conditionedVariables(), factor.variableDomainsDict())
 
-        
         # Returns new dictionary with new key-value pair:
         #  {..., 'eliminationVariable': val}
         newDict = lambda val : dict(asgmt, **{eliminationVariable: val})
@@ -190,6 +189,7 @@ def eliminateWithCallTracking(callTrackingList=None):
             newFactor.setProbability(asgmt, newProbabilty)
 
         return newFactor
+        "*** END YOUR CODE HERE ***"
 
     return eliminate
 
