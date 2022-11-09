@@ -99,10 +99,27 @@ def joinFactors(factors):
                     "\nappear in more than one input factor.\n" + 
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
-
-
+ 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    unconditioned, conditioned = set(), set()
+    for factor in factors:
+        unconditioned = unconditioned.union(factor.unconditionedVariables())
+        conditioned = conditioned.union(factor.conditionedVariables())
+
+    # If a variable X appears as unconditioned,
+    #  it is removed from the set of condtioned variables
+    conditioned -= unconditioned
+
+    joined = Factor(unconditioned, conditioned, list(factors)[0].variableDomainsDict())
+
+    # Joint distribution
+    #  P( x1, x2, ... , xn ) = Product(i=1, n)[ P( xi | parents(Xi) ) ]
+    for asgmt in joined.getAllPossibleAssignmentDicts():
+        joined.setProbability(asgmt, 1) # init
+        for factor in factors:
+            joined.setProbability(asgmt,
+                        joined.getProbability(asgmt) * factor.getProbability(asgmt))
+    return joined
     "*** END YOUR CODE HERE ***"
 
 
