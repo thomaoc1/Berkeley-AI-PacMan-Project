@@ -113,7 +113,7 @@ def joinFactors(factors):
     joined = Factor(unconditioned, conditioned, list(factors)[0].variableDomainsDict())
 
     # Joint distribution
-    #  P( x1, x2, ... , xn ) = Product(i=1, n)[ P( xi | parents(Xi) ) ]
+    #   P( x1, x2, ... , xn ) = Product(i=1, n)[ P( xi | parents(Xi) ) ]
     for asgmt in joined.getAllPossibleAssignmentDicts():
         joined.setProbability(asgmt, 1) # init
         for factor in factors:
@@ -125,7 +125,7 @@ def joinFactors(factors):
 
 def eliminateWithCallTracking(callTrackingList=None):
 
-    def eliminate(factor, eliminationVariable):
+    def eliminate(factor : Factor, eliminationVariable):
         """
         Question 4: Your eliminate implementation 
 
@@ -169,8 +169,26 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-        "*** END YOUR CODE HERE ***"
+        unconditioned: set = factor.unconditionedVariables()
+        unconditioned.remove(eliminationVariable)
+        
+        # Factor with variable removed
+        newFactor = Factor(unconditioned, factor.conditionedVariables(), factor.variableDomainsDict())
+
+        elimVarDomain = factor.variableDomainsDict()[eliminationVariable]
+        # Elimination of variable
+        #   P( X ) = Sum(Y)[ P(X, Y) ]
+        for asgmt in newFactor.getAllPossibleAssignmentDicts():
+            prob = 0
+            for val in elimVarDomain:
+                # Add eliminated variable value to assignment
+                asgmt[eliminationVariable] = val
+                # Add probability of tmp assigment to new assigment
+                prob += factor.getProbability(asgmt)
+
+            newFactor.setProbability(asgmt, prob)
+
+        return newFactor
 
     return eliminate
 
