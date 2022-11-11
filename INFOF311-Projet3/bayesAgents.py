@@ -284,7 +284,18 @@ def getMostLikelyFoodHousePosition(evidence, bayesNet, eliminationOrder):
     (This should be a very short method.)
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    factor = inference.inferenceByVariableElimination(bayesNet, HOUSE_VALS, evidence, eliminationOrder)
+    
+    assignment = {}
+    maxProb = 0
+
+    for asgmt in factor.getAllPossibleAssignmentDicts():
+        currentProb = factor.getProbability(asgmt)
+        if currentProb > maxProb:
+            maxProb = currentProb
+            assignment = asgmt
+
+    return assignment[FOOD_HOUSE_VAR]
     "*** END YOUR CODE HERE ***"
 
 
