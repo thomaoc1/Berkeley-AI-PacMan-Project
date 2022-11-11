@@ -119,6 +119,7 @@ def joinFactors(factors):
         for factor in factors:
             joined.setProbability(asgmt,
                         joined.getProbability(asgmt) * factor.getProbability(asgmt))
+
     return joined
     "*** END YOUR CODE HERE ***"
 
@@ -196,7 +197,7 @@ def eliminateWithCallTracking(callTrackingList=None):
 eliminate = eliminateWithCallTracking()
 
 
-def normalize(factor):
+def normalize(factor : Factor):
     """
     Question 5: Your normalize implementation 
 
@@ -244,6 +245,23 @@ def normalize(factor):
                             str(factor))
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    total = sum([factor.getProbability(asgmt) for asgmt in factor.getAllPossibleAssignmentDicts()])
+
+    unconditioned = factor.unconditionedVariables()
+    conditioned = factor.conditionedVariables()
+
+    # Variables with only one value are conditioned
+    for uncVar in factor.unconditionedVariables():
+        if len(factor.variableDomainsDict()[uncVar]) == 1:
+            conditioned.add(uncVar)
+            unconditioned.remove(uncVar)
+    
+    newFactor = Factor(unconditioned, conditioned, factor.variableDomainsDict())
+
+    # Normalising probabilities
+    for asgmt in newFactor.getAllPossibleAssignmentDicts():
+        newFactor.setProbability(asgmt, factor.getProbability(asgmt) / total)
+
+    return newFactor
     "*** END YOUR CODE HERE ***"
 
