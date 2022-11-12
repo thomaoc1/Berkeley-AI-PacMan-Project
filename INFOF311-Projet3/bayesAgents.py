@@ -289,6 +289,7 @@ def getMostLikelyFoodHousePosition(evidence, bayesNet, eliminationOrder):
     assignment = {}
     maxProb = 0
 
+    # Computing assigment with highest probability
     for asgmt in factor.getAllPossibleAssignmentDicts():
         currentProb = factor.getProbability(asgmt)
         if currentProb > maxProb:

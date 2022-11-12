@@ -180,7 +180,7 @@ def eliminateWithCallTracking(callTrackingList=None):
         #  {..., 'eliminationVariable': val}
         newDict = lambda val : dict(asgmt, **{eliminationVariable: val})
 
-        elimVarDomain = factor.variableDomainsDict()[eliminationVariable]
+        elimVarDomain: list[str] = factor.variableDomainsDict()[eliminationVariable]
 
         # Elimination of variable
         #   P( X ) = Sum(Y)[ P(X, Y) ]
@@ -247,8 +247,8 @@ def normalize(factor : Factor):
     "*** YOUR CODE HERE ***"
     total = sum([factor.getProbability(asgmt) for asgmt in factor.getAllPossibleAssignmentDicts()])
 
-    unconditioned = factor.unconditionedVariables()
-    conditioned = factor.conditionedVariables()
+    unconditioned: set = factor.unconditionedVariables()
+    conditioned: set = factor.conditionedVariables()
 
     # Variables with only one value are conditioned
     for uncVar in factor.unconditionedVariables():
