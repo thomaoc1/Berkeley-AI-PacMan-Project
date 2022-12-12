@@ -62,22 +62,18 @@ class ValueIterationAgent(ValueEstimationAgent):
 
     def runValueIteration(self, iterations: int):
         for _ in range(iterations):
+            tmpVals = util.Counter()
             for state in self.mdp.getStates():
                 bestTotal = float('-inf')
-                for action in self.mdp.getPossibleActions(state):
-                    currentTotal = 0
-                    for stateProbPair in self.mdp.getTransitionStatesAndProbs(state, action):
-                        bestTotal += stateProbPair[1] \
-                                    * (self.mdp.getReward(state, action, stateProbPair[0]) \
-                                    + self.discount * self.values[stateProbPair[0]])
-                    
-                    bestTotal = max(currentTotal, bestTotal)
                 
-                if bestTotal == float('-inf'):
-                    continue
-
-                self.values[state] = bestTotal
-
+                for action in self.mdp.getPossibleActions(state):
+                    bestTotal = max(self.computeQValueFromValues(state, action), bestTotal)
+                
+                if bestTotal != float('-inf'):
+                    tmpVals[state] = bestTotal
+              
+            self.values = tmpVals
+                
 
     def getValue(self, state) -> float:
         """
@@ -109,15 +105,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         # TODO
-        actions = self.mdp.getPossibleActions(state)
-        maxaction = None
-        maxvalueoveractions = -999999
-        for action in actions: 
-           value = self.computeQValueFromValues(state,action)
-           if value > maxvalueoveractions:
-                maxvalueoveractions = value
-                maxaction = action  
-        return maxaction
+        actionDict = {}
+        for action in self.mdp.getPossibleActions(state): 
+           actionDict[action] = self.computeQValueFromValues(state, action)
+           
+        return max(actionDict, key=actionDict.get) if len(actionDict) > 0 else None
         
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
