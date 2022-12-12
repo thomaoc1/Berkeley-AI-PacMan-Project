@@ -45,14 +45,41 @@ class PolicyIterationAgent(ValueIterationAgent):
         You can consider that the values converged when the
         biggest change in value is smaller than 
         self.value_iteration_tolerance."""
-        util.raiseNotDefined()
+        from copy import copy
+
+        converged = False
+        uprime = util.Counter()
+
+        while not converged:
+            converged = True
+            for state in self.mdp.getStates():
+                
+                if self.mdp.isTerminal(state): continue
+                
+                uprime[state] = self.computeQValueFromValues(state, self.policy[state])
+                delta = abs(uprime[state] - self.values[state])
+
+                if delta >= self.value_iteration_tolerance:
+                    converged = False
+
+            self.values = uprime.copy()
+
 
     def updatePolicy(self):
         """In this method you should update the agent's policy, 
         stored in self.policy, and return a boolean 
         indicating whether the policy has converged."""
         # TODO
-        util.raiseNotDefined()
+        newPolicy = {
+            state: self.computeActionFromValues(state)
+            for state in self.mdp.getStates()
+        }
+
+        unchanged = self.policy == newPolicy
+        self.policy = newPolicy
+
+        return unchanged
+
        
 
     def getPolicy(self, state):

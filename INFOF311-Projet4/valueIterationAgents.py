@@ -89,10 +89,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         # TODO
         qval = 0
-        for stateProbPair in self.mdp.getTransitionStatesAndProbs(state, action):
-            qval += stateProbPair[1] \
-                        * (self.mdp.getReward(state, action, stateProbPair[0]) \
-                                + self.discount * self.values[stateProbPair[0]])
+        for sp in self.mdp.getTransitionStatesAndProbs(state, action):
+            qval += sp[1] * (self.mdp.getReward(state, action, sp[0]) \
+                                + self.discount * self.values[sp[0]])
         return qval
 
     def computeActionFromValues(self, state) -> Optional[str]:
@@ -105,11 +104,12 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         # TODO
-        actionDict = {}
-        for action in self.mdp.getPossibleActions(state): 
-           actionDict[action] = self.computeQValueFromValues(state, action)
+        actionDict = {
+            action: self.computeQValueFromValues(state, action) 
+            for action in self.mdp.getPossibleActions(state)
+        }
            
-        return max(actionDict, key=actionDict.get) if len(actionDict) > 0 else None
+        return max(actionDict, key=actionDict.get, default=0)
         
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
