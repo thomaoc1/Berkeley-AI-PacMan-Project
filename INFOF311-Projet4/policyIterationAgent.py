@@ -45,7 +45,6 @@ class PolicyIterationAgent(ValueIterationAgent):
         You can consider that the values converged when the
         biggest change in value is smaller than 
         self.value_iteration_tolerance."""
-        from copy import copy
 
         converged = False
         uprime = util.Counter()
