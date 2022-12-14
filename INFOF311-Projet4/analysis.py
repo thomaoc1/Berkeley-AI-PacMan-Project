@@ -24,42 +24,37 @@ import util
 
 
 def question2a() -> Tuple[float, float, float]:
-    util.raiseNotDefined()
-    discount = None
-    noise = None
-    living_reward = None
+    discount = 0.4
+    noise = 0
+    living_reward = -2
     return discount, noise, living_reward
     # If not possible, return 'NOT POSSIBLE'
 
 def question2b()-> Tuple[float, float, float]:
-    util.raiseNotDefined()
-    discount = None
-    noise = None
-    living_reward = None
+    discount = 0.4
+    noise = 0.5
+    living_reward = -2
     return discount, noise, living_reward
     # If not possible, return 'NOT POSSIBLE'
 
 def question2c()-> Tuple[float, float, float]:
-    util.raiseNotDefined()
-    discount = None
-    noise = None
-    living_reward = None
+    discount = 1
+    noise = 0
+    living_reward = 0
     return discount, noise, living_reward
     # If not possible, return 'NOT POSSIBLE'
 
 def question2d()-> Tuple[float, float, float]:
-    util.raiseNotDefined()
-    discount = None
-    noise = None
-    living_reward = None
+    discount = 1
+    noise = 0.5
+    living_reward = 0
     return discount, noise, living_reward
     # If not possible, return 'NOT POSSIBLE'
 
 def question2e()-> Tuple[float, float, float]:
-    util.raiseNotDefined()
-    discount = None
-    noise = None
-    living_reward = None
+    discount = 0
+    noise = 0
+    living_reward = 11
     return discount, noise, living_reward
     # If not possible, return 'NOT POSSIBLE'
 
