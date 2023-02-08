@@ -1,1 +1,1 @@
-# Berkeley-AI-PacMan-Project-
+# Berkeley-AI-PacMan-Project
